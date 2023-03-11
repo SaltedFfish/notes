@@ -1,43 +1,92 @@
-# extend
+## es6 中 constructor 和 super 的作用
 
-**继承是什么？**
+### es5 构造函数
 
--   继承是为了子类可以使用父类上的属性和方法并能对其进行扩展，实现属性或方法共享
+```js
+// 创建一个Circle构造函数
+function Circle(centerPoint, radius) {
+    this.centerPoint = centerPoint;
+    this.radius = radius;
+}
+// 往原型对象上添加方法
+Circle.prototype.getCenterPoint = function () {
+    return this.centerPoint;
+};
+// 创建一个实例
+const circle = new Circle([10, 20], 10);
+```
 
-js 中基本所有的数据都可以看成对象，但并不代表就是在使用面向对象编程了。
+### es6 构造函数
 
-js 的面向对象编程和其他语言不太一样。在其他语言（java/c#......）中，类和实例是大多数面向对象编程语言的基本概念：
+```js
+class Circle {
+    constructor(centerPoint, radius) {
+        this.centerPoint = centerPoint;
+        this.radius = radius;
+    }
 
--   类：指对象的模板类型，类本身就是一种类型，例如定义一个 Book 类来表示书，但指任何具体的什么书，哪本书，哪类书
--   实例：根据类所创建的对象，例如根据 Book 类可以创建出《javascript 高级程序设计》/《javascript 框架设计》/《javascript 设计模式与开发实践》等多个实例，每个实例表示一本具体的书籍，他们都属于 Book 类
+    getCenterPoint() {
+        // constructor()
+        console.log(this.constructor);
+        return this.centerPoint;
+    }
+}
 
-这在 js 中稍微有些区别，js 不区分类和实例的概念，而是通过原型（prototype）来实现面向对象编程。
+// 创建一个实例
+const circle = new Circle([10, 20], 10);
+```
 
-> -   每个函数都有一个`prototype`属性，它默认指向一个对象，这个对象称为原型对象，原型对象中有一个 constructor 属性，constructor 指向函数对象
-> -   每个实例对象都有一个 \_\_proto\_\_
-> -   实例对象的\_\_proto\_\_和它所对应的构造函数的原型相等（同一个引用，地址相同，指向同个对象）
+### constructor
 
-    function Fn () {}
+其中`constructor`方法是类中默认的构造函数，通过 new 创建一个实例对象时自动调用该方法，
+一个类中必须有`constructor`方法，即使没定义也会默认添加`constructor`方法，
+一般`constructor`方法返回实例对象的 this
 
-    // 每个函数都有prototype属性，指向函数的原型对象
-    console.log(Fn.prototype)
+### super
 
-    // 原型对象上会有一个constructor属性
-    console.log(Fn.prototype.constructor)
+**在`constructor`中必须调用`super`方法，因为子类没有自身的`this`对象，而是继承父类的`this`对象并对其进行加工，
+而`super`虽然代表了父类的构造函数，但返回的是子类的实例，即内部的`this`指向子类，
+因为`super()`相当于`Parent.prototype.constructor.call(this,props)`**
 
-    // 原型对象的constructor属性指向函数对象
-    console.log(Fn.prototype.constructor === Fn)
-    console.log(Date.prototype.constructor === Date)
+`super`关键字，既可以当作函数使用，也可以当作对象使用
 
-    // F为实例对象，创建一个实例对象
-    const F = new Fn() // 内部做了一件事：this.__proto__ = Fn.prototype
+`super`当函数使用
 
-    // 每个实例对象都有一个__proto__属性
-    console.log(F.__proto__)
+```js
+class Parent {
+    getX() {
+        return 2;
+    }
+}
+class Child extends Parent {
+    constructor() {
+        // es6要求，子类的构造函数必须执行一次super函数，否则会报错
+        super();
+    }
+}
+```
 
-    // 实例对象的__proto__和它所对应的构造函数的原型相等
-    console.log(F.__proto__ === Fn.prototype)
+`super`当对象使用
+通过`super`调用父类的方法时，super 会绑定子类的`this`
 
-**有什么用？**
-
-**怎么继承？**
+```js
+class Graphics {
+    constructor() {
+        this.centerPoint = [10, 20];
+    }
+    getCenterPoint() {
+        return this.centerPoint;
+    }
+}
+class Rect extends Graphics {
+    constructor() {
+        super();
+        this.centerPoint = [5, 10];
+    }
+    getCenterPoint() {
+        return super.getCenterPoint();
+    }
+}
+const rect = new Rect();
+rect.getCenterPoint(); // [5, 10]
+```
