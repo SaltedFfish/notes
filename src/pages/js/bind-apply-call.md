@@ -73,3 +73,74 @@ const cases = [
 ```
 
 # bind
+
+### `bind`的用法
+
+```js
+// bind用法的一种
+function test(a, b) {
+    return a + b;
+}
+
+const bindCases = [
+    test.bind({}, 1, 2),
+    test.bind({}, 1)(2),
+    test.bind({})(1, 2),
+];
+console.log(bindCases);
+
+// bind用法的另一种
+function Book(name, author) {
+    this.name = name;
+    this.author = author;
+}
+Book.prototype.getAuthor = function () {
+    return this.author;
+};
+const Book1 = Book.bind({});
+const book = new Book1("js从入门到精通", "小明");
+console.log(Book1.prototype === Book.prototype, book.getAuthor());
+```
+
+### 实现
+
+```js
+Function.prototype._bind = function (context) {
+    var fn = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    function target() {
+        console.log("target.this", this);
+        var innerArgs = Array.prototype.slice.call(arguments);
+        return fn.apply(context, args.concat(innerArgs));
+    }
+
+    // 这一段待修改
+    function Buffer() {}
+    Buffer.prototype = fn.prototype;
+    target.prototype = new Buffer();
+
+    return target;
+};
+
+function test(a, b) {
+    return a + b;
+}
+
+const cases = [
+    test._bind({}, 1, 2)(),
+    test._bind({})(1, 2),
+    test._bind({}, 1)(2),
+];
+
+function Book(name, author) {
+    this.name = name;
+    this.author = author;
+}
+Book.prototype.getAuthor = function () {
+    return this.author;
+};
+const Book1 = Book._bind({});
+const book = new Book1("js从入门到精通", "小明");
+console.log(Book1.prototype === Book.prototype, book.getAuthor());
+```
