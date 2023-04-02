@@ -90,3 +90,6 @@ require(['hello'], function(hello) {
 ```
 
 ## UMD
+
+
+<!-- 待补充... -->
