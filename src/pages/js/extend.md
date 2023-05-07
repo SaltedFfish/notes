@@ -90,6 +90,3 @@ class Rect extends Graphics {
 const rect = new Rect();
 rect.getCenterPoint(); // [5, 10]
 ```
-
-
-![hhh](https://www.wolai.com/hemi/nZQgSEu2P4p6i9fsXinA8v#q21HaJWNiZKWoCgRauiaJ5)
